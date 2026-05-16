@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../services/apiClient';
 import { PageHeader, StatCard, TableWrap, Th, Td, Badge, Btn, Spinner, useToast, Toast } from '../components/UI';
 
-/* ── Generador PDF global ───────────────────────────────────────────────── */
+/* ── Generador PDF global — diseño constancia institucional ─────────────── */
 function generarPDFGlobal({ estudiante: e, actividades, totalHoras, meta }) {
   const hoy    = new Date().toLocaleDateString('es-SV', { year: 'numeric', month: 'long', day: 'numeric' });
   const codigo = `USO-SS-GLOBAL-${e.id_usuario.toString().padStart(5, '0')}`;
@@ -12,119 +12,128 @@ function generarPDFGlobal({ estudiante: e, actividades, totalHoras, meta }) {
       <td>${a.titulo}</td>
       <td>${a.ubicacion || '—'}</td>
       <td>${a.horario   || '—'}</td>
-      <td style="text-align:center;font-weight:700;color:#0A1B4E">${a.horas_acreditar}h</td>
+      <td style="text-align:center;font-weight:700;color:#1a3a6b">${a.horas_acreditar}h</td>
       <td>${new Date(a.fecha_inscripcion).toLocaleDateString('es-SV')}</td>
     </tr>`).join('');
 
   const html = `<!DOCTYPE html>
 <html lang="es"><head><meta charset="UTF-8"/>
 <title>Constancia Global de Servicio Social</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet"/>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:Georgia,serif;color:#1a1a2e;background:#fff}
-  .page{width:794px;min-height:1123px;margin:0 auto;padding:55px 65px;position:relative}
-  .border-outer{position:absolute;inset:18px;border:3px solid #0A1B4E;pointer-events:none}
-  .border-inner{position:absolute;inset:24px;border:1px solid #c8a84b;pointer-events:none}
-  .header{text-align:center;margin-bottom:30px}
-  .logo-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:12px}
-  .logo-box{width:50px;height:50px;background:#0A1B4E;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;font-weight:700}
-  .uni-name{font-size:19px;font-weight:700;color:#0A1B4E;letter-spacing:2px}
-  .uni-sub{font-size:11px;color:#4a5578;letter-spacing:1px;margin-top:2px}
-  .divider{height:2px;background:linear-gradient(90deg,transparent,#c8a84b,transparent);margin:14px auto;width:80%}
-  .doc-title{font-size:22px;font-weight:700;color:#0A1B4E;letter-spacing:2px;text-transform:uppercase;margin:8px 0 2px}
-  .doc-sub{font-size:12px;color:#4a5578}
-  .badge{display:inline-block;background:#0fce8a;color:#fff;font-size:11px;font-weight:700;letter-spacing:1px;padding:4px 14px;border-radius:20px;margin:10px 0;text-transform:uppercase}
-  .body-text{font-size:13.5px;line-height:1.9;color:#2d2d4e;margin:20px 0;text-align:justify}
-  .body-text strong{color:#0A1B4E}
-  .sgrid{display:grid;grid-template-columns:1fr 1fr;border:1px solid rgba(10,27,78,.15);border-radius:8px;overflow:hidden;margin:18px 0;font-size:12.5px}
-  .sl{background:#f4f6fb;padding:9px 14px;font-weight:600;color:#0A1B4E;border-bottom:1px solid rgba(10,27,78,.08);border-right:1px solid rgba(10,27,78,.08)}
-  .sv{padding:9px 14px;color:#2d2d4e;border-bottom:1px solid rgba(10,27,78,.08)}
-  .act-title{font-size:13px;font-weight:700;color:#0A1B4E;margin:20px 0 8px;letter-spacing:.5px;text-transform:uppercase}
-  table.acts{width:100%;border-collapse:collapse;font-size:12px}
-  table.acts th{background:#0A1B4E;color:#fff;padding:9px 12px;text-align:left;font-weight:600}
-  table.acts td{padding:8px 12px;border-bottom:1px solid rgba(10,27,78,.08);color:#2d2d4e}
-  table.acts tr:nth-child(even) td{background:#f8f9fd}
-  .total-row{display:flex;justify-content:flex-end;margin-top:10px}
-  .total-box{background:#0A1B4E;color:#fff;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700}
-  .sello-row{display:flex;justify-content:space-between;align-items:flex-end;margin-top:40px}
-  .sello-box{text-align:center;width:180px}
-  .sello-line{border-top:1px solid #0A1B4E;margin-bottom:7px}
-  .sello-label{font-size:10px;color:#4a5578}
-  .sello-name{font-size:11px;font-weight:700;color:#0A1B4E}
-  .sello-circle{width:100px;height:100px;border-radius:50%;border:3px solid #0A1B4E;margin:0 auto 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,27,78,.04)}
-  .s1{font-size:8px;font-weight:700;color:#0A1B4E;letter-spacing:1px;text-align:center}
-  .s2{font-size:17px;font-weight:700;color:#c8a84b}
-  .s3{font-size:7px;color:#4a5578;text-align:center}
-  .codigo{position:absolute;bottom:36px;right:65px;font-size:9.5px;color:#8d97b8}
+  body{font-family:'Source Sans 3',sans-serif;background:#fff;color:#222}
+  .wrap{max-width:700px;margin:32px auto;border:3px solid #1a3a6b;border-radius:4px;overflow:hidden}
+  .top-green{background:#2c6e2f;height:8px}
+  .top-blue{background:#1a3a6b;padding:6px 0;display:flex;justify-content:center}
+  .top-blue span{color:#fff;font-size:11px;letter-spacing:1px;opacity:.75}
+  .header-main{padding:28px 40px 20px;display:flex;align-items:center;gap:20px;border-bottom:3px solid #2c6e2f}
+  .logo-box{background:#1a3a6b;color:#fff;font-family:'Source Sans 3',sans-serif;font-weight:600;font-size:20px;letter-spacing:2px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:6px;flex-shrink:0}
+  .univ-name{font-family:'Playfair Display',serif;color:#1a3a6b;font-size:22px;font-weight:600;line-height:1.2;margin:0}
+  .univ-sub{color:#2c6e2f;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+  .body{padding:32px 40px 28px}
+  .doc-title{font-family:'Playfair Display',serif;color:#1a3a6b;font-size:20px;font-weight:600;text-align:center;letter-spacing:1px;margin:0 0 6px}
+  .doc-sub{text-align:center;color:#555;font-size:13px;margin:0 0 18px}
+  .badge{display:flex;justify-content:center;margin-bottom:24px}
+  .badge span{background:#2c6e2f;color:#fff;font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:6px 20px;border-radius:100px}
+  .body-text{color:#222;font-size:14px;line-height:1.75;text-align:justify;margin-bottom:24px}
+  .body-text strong{color:#1a3a6b}
+  .info-table{width:100%;border-collapse:collapse;font-size:13.5px;margin-bottom:28px}
+  .info-table tr:nth-child(even) td{background:#f0f4fb}
+  .info-table td{padding:9px 14px;border:1px solid #d0dae8;vertical-align:top}
+  .info-table td:first-child{font-weight:600;color:#1a3a6b;white-space:nowrap;width:38%}
+  .info-table td:last-child{color:#222}
+  .section-title{color:#fff;background:#1a3a6b;font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:7px 14px;margin-bottom:0;border-radius:3px 3px 0 0}
+  .act-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:28px}
+  .act-table th{background:#2c6e2f;color:#fff;padding:8px 10px;text-align:left;font-weight:600;font-size:12px}
+  .act-table td{border:1px solid #d0dae8;padding:8px 10px;color:#222}
+  .act-table tr:nth-child(even) td{background:#f6f9f2}
+  .footer-line{border-top:2px solid #2c6e2f;padding-top:20px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px}
+  .footer-date{color:#555;font-size:12px}
+  .signature-block{text-align:center;font-size:12px;color:#555}
+  .signature-line{width:160px;border-top:1.5px solid #1a3a6b;margin:0 auto 4px}
+  .sig-name{color:#1a3a6b;font-weight:600;font-size:12px}
+  .foot-code{background:#f0f4fb;border-top:1px solid #d0dae8;padding:8px 40px;font-size:10px;color:#6b7a99;text-align:right}
+  .bot-green{background:#2c6e2f;height:6px}
+  .bot-blue{background:#1a3a6b;height:10px}
   @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-</style></head><body>
-<div class="page">
-  <div class="border-outer"></div><div class="border-inner"></div>
-  <div class="header">
-    <div class="logo-row">
-      <div class="logo-box">USO</div>
-      <div><div class="uni-name">UNIVERSIDAD DE SONSONATE</div><div class="uni-sub">SISTEMA DE SERVICIO SOCIAL</div></div>
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+  window.addEventListener('load', function() {
+    var el = document.querySelector('.wrap');
+    var opt = {
+      margin: [6, 6, 6, 6],
+      filename: document.title + '.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(el).save();
+  });
+</script></head><body>
+<div class="wrap">
+  <div class="top-green"></div>
+  <div class="top-blue"><span>DOCUMENTO OFICIAL</span></div>
+
+  <div class="header-main">
+    <div class="logo-box">USO</div>
+    <div>
+      <p class="univ-name">Universidad de Sonsonate</p>
+      <p class="univ-sub">Sistema de Servicio Social</p>
     </div>
-    <div class="divider"></div>
-    <div class="doc-title">Constancia Global de Servicio Social</div>
-    <div class="doc-sub">Documento oficial de culminación — ${totalHoras} horas acreditadas</div>
-    <div class="badge">✓ Servicio social completado</div>
   </div>
-  <div class="body-text">
-    La <strong>Universidad de Sonsonate</strong>, a través de la Coordinación de Servicio Social,
-    hace constar que el/la estudiante <strong>${e.nombre_completo}</strong> ha cumplido
-    satisfactoriamente con el total de horas de servicio social requeridas, completando
-    <strong>${totalHoras} horas</strong> distribuidas en ${actividades.length} actividad(es),
-    superando el requisito mínimo de <strong>${meta} horas</strong>.
-  </div>
-  <div class="sgrid">
-    <div class="sl">Nombre completo</div>    <div class="sv">${e.nombre_completo}</div>
-    <div class="sl">Correo institucional</div><div class="sv">${e.correo_institucional}</div>
-    <div class="sl">Carrera</div>             <div class="sv">${e.nombre_carrera || '—'}</div>
-    <div class="sl">Facultad</div>            <div class="sv">${e.nombre_facultad || '—'}</div>
-    <div class="sl">Total de horas</div>      <div class="sv"><strong>${totalHoras} horas ✓</strong></div>
-    <div class="sl">Actividades</div>         <div class="sv">${actividades.length} completadas</div>
-  </div>
-  <div class="act-title">Detalle de actividades realizadas</div>
-  <table class="acts">
-    <thead><tr><th>Actividad</th><th>Ubicación</th><th>Horario</th><th>Horas</th><th>Fecha</th></tr></thead>
-    <tbody>${filas}</tbody>
-  </table>
-  <div class="total-row"><div class="total-box">Total acreditado: ${totalHoras} horas</div></div>
-  <div class="body-text" style="font-size:12.5px;margin-top:18px;">
-    Se extiende la presente constancia en Sonsonate, El Salvador, a los <strong>${hoy}</strong>.
-  </div>
-  <div class="sello-row">
-    <div class="sello-box">
-      <div class="sello-circle">
-        <span class="s1">UNIVERSIDAD<br/>DE SONSONATE</span>
-        <span class="s2">USO</span>
-        <span class="s3">SERVICIO<br/>SOCIAL</span>
+
+  <div class="body">
+    <p class="doc-title">CONSTANCIA GLOBAL DE SERVICIO SOCIAL</p>
+    <p class="doc-sub">Documento oficial de culminación — ${totalHoras} horas acreditadas</p>
+
+    <div class="badge"><span>✓ Servicio Social Completado</span></div>
+
+    <p class="body-text">
+      La <strong>Universidad de Sonsonate</strong>, a través de la Coordinación de Servicio Social,
+      hace constar que el/la estudiante <strong>${e.nombre_completo}</strong> ha cumplido
+      satisfactoriamente con el total de horas de servicio social requeridas, completando
+      <strong>${totalHoras} horas</strong> distribuidas en ${actividades.length} actividad(es),
+      superando el requisito mínimo de <strong>${meta} horas</strong>.
+    </p>
+
+    <table class="info-table">
+      <tr><td>Nombre completo</td>      <td>${e.nombre_completo}</td></tr>
+      <tr><td>Correo institucional</td> <td>${e.correo_institucional}</td></tr>
+      <tr><td>Carrera</td>              <td>${e.nombre_carrera || '—'}</td></tr>
+      <tr><td>Facultad</td>             <td>${e.nombre_facultad || '—'}</td></tr>
+      <tr><td>Total de horas</td>       <td><strong>${totalHoras} horas ✓</strong></td></tr>
+      <tr><td>Actividades</td>          <td>${actividades.length} completadas</td></tr>
+    </table>
+
+    <p class="section-title">Detalle de Actividades Realizadas</p>
+    <table class="act-table">
+      <thead>
+        <tr><th>Actividad</th><th>Ubicación</th><th>Horario</th><th>Horas</th><th>Fecha</th></tr>
+      </thead>
+      <tbody>${filas}</tbody>
+    </table>
+
+    <div class="footer-line">
+      <div class="footer-date">Sonsonate, El Salvador — ${hoy}</div>
+      <div class="signature-block">
+        <div class="signature-line"></div>
+        <div class="sig-name">Coordinación de Servicio Social</div>
+        <div>Universidad de Sonsonate</div>
       </div>
-      <div class="sello-line"></div>
-      <div class="sello-name">Coordinación de Servicio Social</div>
-      <div class="sello-label">Firma y sello institucional</div>
-    </div>
-    <div style="text-align:center;font-size:12px;color:#4a5578;line-height:1.7">
-      <div style="font-size:36px;margin-bottom:6px">🎓</div>
-      <strong style="color:#0A1B4E;font-size:13px">Servicio Social Completado</strong><br/>
-      <span style="font-size:11px">Código: <strong>${codigo}</strong></span><br/>
-      <span style="font-size:11px">Emitido: ${hoy}</span>
-    </div>
-    <div class="sello-box">
-      <div style="height:100px"></div>
-      <div class="sello-line"></div>
-      <div class="sello-name">Decano/a de Facultad</div>
-      <div class="sello-label">Firma autorizante</div>
     </div>
   </div>
-  <div class="codigo">Código: ${codigo} | Emitido el ${hoy}</div>
+
+  <div class="foot-code">Código: ${codigo} | Emitido el ${hoy}</div>
+  <div class="bot-green"></div>
+  <div class="bot-blue"></div>
 </div></body></html>`;
 
-  const v = window.open('', '_blank', 'width=920,height=750');
+  const v = window.open('', '_blank');
   v.document.write(html);
   v.document.close();
-  v.onload = () => v.print();
 }
 
 /* ── Componente principal ───────────────────────────────────────────────── */
